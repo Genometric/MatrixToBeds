@@ -37,14 +37,38 @@ namespace MatrixToBeds
                 writter.Close();
                 writter.Dispose();
             }
+
+            OrganizeFilesInFoldersBasedOnCluster(rPath + "/cells", @"/Users/vahid/atac_seq_data/01_Cluster_Identity.annot");
         }
 
         static List<StreamWriter> GetWritters(string path, string[] columns)
         {
             var rtv = new List<StreamWriter>();
+            if (!Directory.Exists(path + "cells /"))
+                Directory.CreateDirectory(path + "cells/");
             foreach (var barcode in columns)
-                rtv.Add(new StreamWriter(path + barcode + ".bed"));
+                rtv.Add(new StreamWriter(path + "cells/" + barcode + ".bed"));
             return rtv;
+        }
+
+        static void OrganizeFilesInFoldersBasedOnCluster(string path, string clusterAnnotation)
+        {
+            using (StreamReader reader = new StreamReader(clusterAnnotation))
+            {
+                string annotation = "";
+                string[] splitAnnotation;
+                while((annotation=reader.ReadLine()) != null)
+                {
+                    splitAnnotation = annotation.Split('\t');
+                    if (!Directory.Exists(path + "/" + splitAnnotation[1]))
+                        Directory.CreateDirectory(path + "/" + splitAnnotation[1]);
+                    File.Move(path + "/" + splitAnnotation[0] + ".bed", path + "/" + splitAnnotation[1] + "/" + splitAnnotation[0] + ".bed");
+                }
+            }
+
+            Directory.CreateDirectory(path + "/NotClustered");
+            foreach (var file in Directory.GetFiles(path))
+                File.Move(file, path + "/NotClustered/" + Path.GetFileName(file));
         }
     }
 }
