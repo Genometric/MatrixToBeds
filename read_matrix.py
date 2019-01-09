@@ -1,5 +1,5 @@
 from __future__ import print_function
-
+  
 import csv
 import os
 import scipy.io
@@ -47,16 +47,15 @@ mat = scipy.io.mmread(os.path.join(matrix_dir, "matrix.mtx"))
 cx = scipy.sparse.coo_matrix(mat)
 
 
-print(cx.get_shape())
-print('\n\n\n\n>>>>>>>>>>>')
 cx_array = cx.toarray()
-print("rows:\t" + len(cx_array))
-print("cols:\t" + len(cx_array[0]))
-
-for col in len(cx_array[0]):
-    print("processing cell " + col + " of " + cx_array[0], end="\r")
+for col in range(len(cx_array[0])):
+    print("processing cell {} of {}".format(col, len(cx_array[0])), end="\r")
     with open(barcodeFiles[col - 1], "a+") as f:
-        for row in len(cx_array):
+        for row in range(len(cx_array)):
             value = cx_array[row][col]
             if value > 0:
                 f.write(peaks[row])
+# for i, j, v in zip(cx.row, cx.col, cx.data):
+#     if v > 0:
+#         with open(barcodeFiles[j-1], "a+") as f:
+#             f.write(peaks[i])
